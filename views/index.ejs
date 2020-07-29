@@ -1,1 +1,46 @@
- 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>留言板</title>
+    <style>
+        body{
+            width: 600px;
+            margin: 20px auto;
+        }
+        form{
+            border: 1px solid blue;
+        }
+        .out{
+            border: 1px solid skyblue;
+            margin: 10px 0;
+            padding: 0 5px;
+            background: rgb(240, 238, 238);
+        }
+        
+        .out p:first-child span{
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <form action="/message/tijiao" method="post">
+        <p>姓名: <input type="text" name="username"></p>
+        <p>留言: <textarea name="message"></textarea></p>
+        <input type="submit">
+    </form>
+    <hr>
+    <% for(var i=0;i<msg.length;i++){ %>
+        <div class="out">
+            <p><span><%= msg[i].username %></span> 说</p>
+            <p><%= msg[i].message %></p>
+            <p><%= msg[i].date %></p>
+            <p>
+                <a href="/message/update">编辑</a>
+                <a href="/message/delete?id=<%= msg[i]._id %>">删除</a>
+            </p>
+        </div>
+    <% } %>
+</body>
+</html>

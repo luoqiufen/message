@@ -16,4 +16,4 @@ app.get('/',function(req,res){
 })
 
 // 处理 /message开头的请求地址
-app.use('message',message);
+app.use('/message',message);
