@@ -1,8 +1,80 @@
 <!--
  * @Author: your name
  * @Date: 2020-07-29 09:46:40
- * @LastEditTime: 2020-07-29 09:46:41
+ * @LastEditTime: 2020-07-29 13:41:14
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \message\views\index.ejs
---> 
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            width: 80%;
+            margin: 0 auto;
+        }
+
+        form {
+            border: 1px solid #CCC;
+            margin: 20px 0;
+        }
+
+        .show div {
+            border: 1px solid grey;
+            line-height: 30px;
+            margin: 10px;
+        }
+
+        .show div p {
+            padding: 0 10px;
+            margin: 0;
+        }
+
+        .show div p.uname {
+            background: #CCC;
+        }
+
+        .show div p.uname span {
+            color: rgb(8, 50, 163);
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .show div .con{
+            text-indent: 2em;
+        }
+        .show div .last_p{
+            text-align: right;
+        }
+        .show div .last_p span{
+            float: left;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>留言板</h2>
+    <form action="/add" method="post">
+        <p>用户名: <input type="text" name="username"></p>
+        <p>留言: <textarea name="message"></textarea></p>
+        <input type="submit" value="留言">
+    </form>
+    <hr>
+    <form class="show" action="/show" method="post">
+        <% for(var i=0;i<mes.length;i++){ %>
+        <div>
+            <p class="uname"><span><%= mes[i].username %></span> 说:</p>
+
+            <p class="con"><%= mes[i].message %></p>
+            <p class="last_p"><span><%= mes[i].time %></span><a href="/update">编辑</a>&nbsp; <a href="/delete">删除</a></p>
+        </div>
+        <% } %>
+    </form>
+
+</body>
+
+</html>
