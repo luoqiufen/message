@@ -35,10 +35,15 @@ Route.post('/tijiao',function(req,res){
 })
 
 Route.get('/delete',function(req,res){
-
-    db.del(Message,filter,function(err,res){
-        console.log(err);
-        console.log(res);
+    var id = req.query.id
+    db.del(Message,id,function(err,res){
+        if(err){
+            console.log(err);
+            res.render('error',{errMsg:'留言删除失败!'});
+            return;
+        }
+        // 删除成功,回到首页
+        // res.redirect('/');
     })
 })
 
