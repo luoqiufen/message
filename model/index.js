@@ -46,16 +46,15 @@ function del(model, filter, callback) {
  */
 function modify(model, filter, data, callback) {
     if (typeof filter == 'string') {
-        filter = { _id: ObjectId(id) };
+        filter = { _id: ObjectId(filter) };
     }
     model.updateOne(filter, { $set: data }, function (err, res) {
         callback(err, res);
     })
 }
 
-// 查
 /**
- * 
+ * 查
  * @param {*} model 查询的集合
  * @param {JSON} [filter] 查询的条件
  * @param {JSON} [opt] 查询选项
@@ -108,10 +107,22 @@ function find(model, filter, opt, callback) {
     }) 
 }
 
+/**
+ * 统计所有数据条数
+ * @param {*} model 
+ * @param {*} callback 
+ */
+function total(model,callback){
+    model.countDocuments(function(err,count){
+        callback(err,count);
+    })
+}
+
 module.exports = {
     ...require('./models.js'),
     add,
     del,
     modify,
-    find
+    find,
+    total
 }

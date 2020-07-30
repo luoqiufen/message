@@ -1,32 +1,56 @@
- // 处理留言的路由
+// 处理留言的路由
 const express = require('express');
+const sd = require('silly-datetime');
 const Route = express.Router();
 const db = require('../model');
 const Message = db.Message;
 
 
 //  /message请求
-Route.get('/',function(req,res){
-    // 查询数据库中的数据,传递给index页面解析
-    db.find(Message,function(err,docs){
-        if(err){
+Route.get('/', function (req, res) {
+    // 获取页码
+    var page = parseInt(req.query.page)
+    if (page < 1) {
+        page = 1;
+    }
+    // 获取数据的总条数
+    db.total(Message, function (err, count) {
+        if (err) {
             console.log(err);
-            res.render('error',{errMsg:'网络出错'});
+            res.render('error', { errMsg: "服务器故障" });
             return;
         }
-        // 取到数据,传递给页面
-        res.render('index',{msg: docs})
+        // 总页数
+        var allPages = Math.ceil(count / 6);
+        // 当前页超过总页数,调整为最后一页
+        if (page > allPages) {
+            page = allPages;
+        }
+        var opt = { page: page, size: 6 };
+        // 查询数据库中的数据,传递给index页面解析
+        db.find(Message, opt, function (err, docs) {
+            if (err) {
+                console.log(err);
+                res.render('error', { errMsg: '网络出错' });
+                return;
+            }
+            // 取到数据,传递给页面
+            // 传递的数据: 留言信息,总页数,当前页
+            res.render('index', { msg: docs, pages: allPages, current: page })
+        })
+
     })
 })
 
 // post - /message/tijiao
-Route.post('/tijiao',function(req,res){
+Route.post('/tijiao', function (req, res) {
     var query = req.body;
-    
-    db.add(Message,query,function(err){
-        if(err){
+    query.date = sd.format(new Date())
+
+    db.add(Message, query, function (err) {
+        if (err) {
             console.log(err);
-            res.render('error',{errMsg:'提交留言失败!'});
+            res.render('error', { errMsg: '提交留言失败!' });
             return;
         }
         // 提交成功,回到首页
@@ -34,16 +58,41 @@ Route.post('/tijiao',function(req,res){
     })
 })
 
-Route.get('/delete',function(req,res){
+// /message/del删除留言(ajax发送请求)
+Route.get('/del', function (req, res) {
     var id = req.query.id
-    db.del(Message,id,function(err,res){
-        if(err){
+    db.del(Message, id, function (err, result) {
+        if (err) {
             console.log(err);
-            res.render('error',{errMsg:'留言删除失败!'});
+            res.send({ status: 1, msg: '网络出错了' });
             return;
         }
-        // 删除成功,回到首页
-        // res.redirect('/');
+        if (result.deletedCount == 0) {
+            res.send({ status: 1, msg: '删除失败' });
+        } else {
+            res.send({ status: 0, msg: '删除成功' });
+        }
+    })
+})
+
+// post - /message/modify(Ajax发送的请求)
+Route.post('/modify', function (req, res) {
+    var id = req.body.id;
+    var newMsg = req.body.message;
+
+    var data = { message: newMsg };
+    db.modify(Message, id, data, function (err, result) {
+        if (err) {
+            console.log(err);
+            res.send({ status: 1, msg: '网络出错了!' });
+            return;
+        }
+        if (result.nModified == 0) {
+            res.send({ status: 2, msg: '数据未修改' });
+        } else {
+            res.send({ status: 0, msg: '修改成功' });
+        }
+        // console.log(result)
     })
 })
 
