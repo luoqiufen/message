@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 
-const url = 'mongodb://122.51.239.36:27017/web';
+const url = 'mongodb://localhost:27017/web';
 const opt = { useNewUrlParser: true, useUnifiedTopology: true };
 
 // 连接数据库
