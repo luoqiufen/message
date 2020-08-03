@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            width: 600px;
+            margin: 0 auto;
+        }
+        #center .left{
+            float: left;
+        }
+        #center .left img{
+            width: 100px;
+        }
+        #center .right{
+            float: left;
+            margin-left: 50px;
+        }
+        #center .return{
+            float: right;
+        }
+    </style>
+</head>
+<body>
+    <h1>个人中心</h1>
+    <div id="center">
+        <div class="left">
+            <img src="<%= user.avatar %>" alt="">
+            <h4><a href="">修改头像</a></h4>
+        </div>
+        <div class="right">
+            <p>用户名: <%= user.username %></p>
+            <p>昵称：<span><%= user.nickname %></span>  <a href="javascript:;" onclick="change()">修改昵称</a></p>
+            <p>
+                <a href="/user/changePwd">修改密码</a>
+            </p>
+            
+        </div>
+        <div class="return">
+            <a href="/">返回首页</a>
+        </div>
+    </div>
+
+    <script src="/js/jquery.min.js"></script>
+    <script>
+        var oldNick = '';//旧昵称
+        function change () {
+            // $('.right span').html();
+            oldNick = $('.right span').html();
+            $('.right span').html('<input type="text" value="'+oldNick+'" onblur="sendNick()">');
+            $('.right span input').focus();
+        }
+        // 文本输入框触发onblur事件
+        function sendNick(){
+            var val = $('.right span input').val().trim();
+            if(val==''){
+                alert('昵称不能为空');
+                return;
+            }
+            $('.right span').html(val);
+
+            // 发送请求,修改新昵称
+            $.ajax({
+                url:'/user/changeNick?nickname='+val,
+                success:function(result){
+                    if(result.status == 1){
+                        // 修改失败
+                        alert('修改失败');
+                    }
+                    // 修改成功
+                }
+            })
+        }
+
+
+    </script>
+</body>
+</html>

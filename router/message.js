@@ -4,6 +4,7 @@ const sd = require('silly-datetime');
 const Route = express.Router();
 const db = require('../model');
 const Message = db.Message;
+const User = db.User;
 
 
 //  /message请求
@@ -37,9 +38,20 @@ Route.get('/', function (req, res) {
                 res.render('error', { errMsg: '网络出错' });
                 return;
             }
-            // 取到数据,传递给页面
-            // 传递的数据: 留言信息,总页数,当前页,登录的用户名
-            res.render('index', { msg: docs, pages: allPages, current: page ,username: username })
+            // 获取所有用户的基本信息
+            // 可以使用紫的封装的db.find方法
+            // 查询的属性
+            var fields = 'username nickname avatar';
+            User.find({}, fields, function (err, users) {
+                if (err) {
+                    console.log(err);
+                    res.render('error', { errMsg: '获取用户信息失败' });
+                    return;
+                }
+                // 取到数据,传递给页面
+                // 传递的数据: 留言信息,总页数,当前页,登录的用户名
+                res.render('index', { msg: docs, pages: allPages, current: page, username: username, users: users })
+            })
         })
 
     })
@@ -108,7 +120,7 @@ Route.post('/modify', function (req, res) {
 
 module.exports = Route;
 
-/* 
+/*
 不需要登录验证的请求:
     登录请求,
     注册请求

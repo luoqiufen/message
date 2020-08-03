@@ -11,13 +11,26 @@
             width: 70%;
             margin: 20px auto;
         }
-
+        h1{
+            background: rgb(196, 243, 243);
+            line-height:60px;
+        }
         form {
             border: 1px solid rgb(144, 144, 250);
             padding: 10px;
             overflow: hidden;
             font-size: large;
             font-weight: bold;
+        }
+        form .p_right{
+            text-align: right;
+        }
+        form .user{
+            text-align: center;
+            margin-top: 20px;
+        }
+        form .user img{
+            width: 100px;
         }
         form input[type=text],textarea{
             width: 100%;
@@ -42,6 +55,9 @@
             padding: 10px 5px;
             background: rgb(240, 238, 238);
             margin: 2%;
+        }
+        .showMsg .out .img img{
+            width: 50px;
         }
 
         .out p:first-child span {
@@ -81,8 +97,26 @@
 </head>
 
 <body>
+    <h1 align="center">留言板</h1>
     <form action="/message/tijiao" method="post" onsubmit="">
-        <p><%= username %></p>   
+        <div class="p_right">
+            <a href="/user/logout">退出登录</a>
+            <a href="/user/center">个人中心</a>
+        </div>
+        <div class="user">
+            <% for(var i = 0; i<users.length;i++){ %>
+                <% if(username == users[i].username){ %>
+                    <div class="avatar">
+                        <img src="<%= users[i].avatar %>" >
+                    </div>
+                    <div class="nickname">
+                        <h2><%= users[i].nickname %></h2>
+                    </div>
+                <% } %>
+            <% } %>
+        </div>
+        
+        <p><%= username %></p>  
         留言: <p><textarea name="message"></textarea></p>
         <input type="submit" class="btn btn-info">
     </form>
@@ -106,15 +140,27 @@
     </ul>
     <div class="showMsg">
         <% for(var i=0;i<msg.length;i++){ %>
-        <div class="out">
-            <p><span><%= msg[i].username %></span> 说</p>
-            <p class="message"><%= msg[i].message %></p>
-            <p><%= msg[i].date %></p>
-            <p>
-                <a href="javascript:;" onclick='modify(this)'>编辑</a>&nbsp;&nbsp;&nbsp;
-                <a href="javascript:;" onclick='del("<%= msg[i]._id %>")'>删除</a>
-            </p>
-        </div>
+            <% for(var j=0;j<users.length;j++){ %>
+                <% if(msg[i].username==users[j].username){ %>
+                <div class="out">
+                    <div class="img">
+                        <img src="<%= users[j].avatar %>">
+                    </div>
+                    <div class="msg">
+                        <p><span><%= users[j].nickname %></span> 说</p>
+                        <p class="message"><%= msg[i].message %></p>
+                        <p><%= msg[i].date %></p>
+                        <% if(username==msg[i].username){ %>
+                        <p>
+                            <a href="javascript:;" onclick='modify(this)'>编辑</a>&nbsp;&nbsp;&nbsp;
+                            <a href="javascript:;" onclick='del("<%= msg[i]._id %>")'>删除</a>
+                        </p>
+                        <%}%>
+                    </div>
+
+                </div>
+                <% } %>
+            <% } %>
         <% } %>
     </div>
     <div class="out last">
