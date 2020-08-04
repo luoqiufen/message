@@ -2,6 +2,9 @@
 // 处理/user开头的请求
 const router = require('express').Router();
 const db = require('../model');
+const fd = require('formidable');
+const fs = require('fs');
+const gm = require('gm');
 const { encrypt } = require('../model/myMd5.js')
 const User = db.User;
 
@@ -216,6 +219,81 @@ router.get('/changeNick',function(req,res){
         }
         
         res.send({status:0,msg:'修改成功'});
+    })
+})
+
+// get /user/upload,跳转到上传头像
+router.get('/upload',function(req,res){
+    res.render('upload');
+})
+
+// post /user/upload,处理图片上传
+router.post('/upload',function(req,res){
+    // 创建表单对象
+    var form = new fd.IncomingForm();
+    // 设置临时保存路径
+    form.uploadDir = './temp';
+    // 解析请求对象
+    form.parse(req,function(err,fields,files){
+        if(err){
+            console.log(err);
+            res.render('error',{errMsg:'上传头像失败'});
+            return;
+        }
+        // 获取图片对象
+        var pic = files.pic;
+        // 对图片的操作
+        var oldPath = pic.path;
+        var name = pic.name;
+        var newPath = './temp/'+name;
+        fs.rename(oldPath,newPath,function(err){
+            if(err){
+                console.log(err);
+                console.log('上传失败');
+                res.render('error',{errMsg:'上传失败'});
+                return;
+            }
+            // 上传成功,跳转到剪切图片的界面
+            res.render('cut',{path:name})
+        });
+    })
+})
+
+// get /user/cut, 剪切图片
+router.get('/cut',function(req,res){
+    var username = req.session.username;
+    // 获取参数
+    var w = req.query.w
+    var h = req.query.h
+    var x = req.query.x
+    var y = req.query.y
+    var img = req.query.img; // /xxx.img
+    // 剪切图片 ./temp/xxx.jpg
+    // 保存路径 .avatar/username/xxx.jpg
+    var i = img.substr(1);
+    var avatar = './avatars/'+username+i;
+    
+    gm('./temp'+img).crop(w,h,x,y).write(avatar,function(err){
+        if(err){
+            console.log(err);
+            res.send({status:1,msg:'剪切失败'});
+            return;
+        }
+        // 剪切成功,将新头像的路径保存到数据库,跳回到个人中心
+        var filter = {username:username};
+        var data = {avatar:'/'+username+i};
+        db.modify(User,filter,data ,function(err,raw){
+            if(err){
+                console.log(err);
+                res.send({status:1,msg:'修改失败'});
+                return;
+            }
+            /* if(raw.nModified==0){
+                res.send({status:1,msg:'修改失败'});
+                return;
+            } */
+            res.send({status:0,msg:'修改成功'});
+        })
     })
 })
 
