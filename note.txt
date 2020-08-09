@@ -23,3 +23,5 @@ message案例
         mongoose
         silly-datetime
         express-session
+        formidable
+        gm
